@@ -37,6 +37,23 @@ x = int(1)   # x will be 1
 y = int(2.8)  # y will be 2
 z = int("3")  # z will be 3
 
+# String
+print("Salam")
+print('Salam')
+
+print("Everything is fine")
+print("He is nicknamed 'Johnny'")
+print('He is also called "Johnny"')
+
+a = "HEY"
+print(a)
+
+a = """Lorem ipsum dolor sit amet,
+consectetur adipiscing elit,
+sed do eiusmod tempor incididunt
+ut labore et dolore magna aliqua."""
+print(a)
+
 # Пример 1
 x = "John"
 y = "John"
