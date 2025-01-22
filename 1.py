@@ -36,3 +36,42 @@ print(type(z))
 x = int(1)   # x will be 1
 y = int(2.8)  # y will be 2
 z = int("3")  # z will be 3
+
+# Пример 1
+x = "John"
+y = "John"
+print(x, y)
+
+# Пример 2
+x = "awesome"
+
+
+def myfunc():
+    print("Python is " + x)
+
+
+myfunc()
+
+# Пример 3
+x = "awesome"
+
+
+def myfunc():
+    x = "fantastic"
+    print("Python is " + x)
+
+
+myfunc()
+print("Python is " + x)
+
+# Пример 4
+x = "awesome"
+
+
+def myfunc():
+    global x
+    x = "fantastic"
+
+
+myfunc()
+print("Python is " + x)
