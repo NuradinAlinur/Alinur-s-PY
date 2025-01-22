@@ -1,22 +1,23 @@
 # number 1
-print("hello World")
+print("hello everynyan")
 
 # syntax
 if 5 > 2:
-    print("Five is greater than two!")
+    print("Five is greater than two! Ez")
 
 # this is a comment
 
 # Variables
-x = 5
-y = "John"
+x = 69
+y = "John SINA"
 print(x)
 print(y)
 
-x, y, z = "Orange", "Banana", "Cherry"
+x, y, z, k = "Pen", "Pineapple", "Apple", "Pen"
 print(x)
 print(y)
 print(z)
+print(k)
 # Data types
 x = 3
 print(type(x))
