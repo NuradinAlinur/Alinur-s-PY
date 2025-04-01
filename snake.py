@@ -5,14 +5,14 @@ import time
 
 pygame.init()
 
-WIDTH, HEIGHT = 820, 620  # Незначительное изменение размеров экрана
-TILE_SIZE = 26  # Изменен размер плиток
-VELOCITY = 10  # Изменена начальная скорость
+WIDTH, HEIGHT = 820, 620  
+TILE_SIZE = 26 
+VELOCITY = 10  
 
-BG_COLOR = (45, 45, 45)  # Слегка изменен цвет фона
-SNAKE_COLOR = (0, 160, 160)  # Изменен цвет змейки
-FOOD_COLOR = (190, 10, 10)  # Незначительное изменение цвета еды
-TEXT_COLOR = (250, 250, 90)  # Незначительное изменение цвета текста
+BG_COLOR = (45, 45, 45) 
+SNAKE_COLOR = (0, 160, 160)  
+FOOD_COLOR = (190, 10, 10)  
+TEXT_COLOR = (250, 250, 90)  
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Classic Snake Game")
@@ -38,7 +38,7 @@ def draw_food(food_pos):
     pygame.draw.rect(screen, FOOD_COLOR, (food_pos[0], food_pos[1], TILE_SIZE, TILE_SIZE))
 
 def game_loop():
-    snake = [(150, 150), (124, 150), (98, 150)]  # Незначительное изменение стартового положения
+    snake = [(150, 150), (124, 150), (98, 150)]  
     direction = "RIGHT"
     food = generate_food(snake)
     score = 0
