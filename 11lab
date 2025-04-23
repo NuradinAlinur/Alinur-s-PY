@@ -1,0 +1,153 @@
+import psycopg2
+import os
+import csv
+import json
+
+
+class User:
+    def __init__(self, full_name, phone_number):
+        self.full_name = full_name
+        self.phone_number = phone_number
+
+    def get_listed_data(self) -> tuple:
+        return (self.full_name, self.phone_number)
+
+
+class DatabaseManager:
+    def __init__(self):
+        self.conn = psycopg2.connect(
+            dbname="postgres",
+            user="postgres",
+            password="20070531",
+            host="localhost",
+            port="5432"
+        )
+        self.cur = self.conn.cursor()
+
+    def close(self):
+        self.cur.close()
+        self.conn.close()
+
+
+class PhoneBook:
+    def __init__(self):
+        self.db = DatabaseManager()
+        self.create_phone_book()
+
+    def create_phone_book(self):
+        self.db.cur.execute(
+            '''
+                CREATE TABLE IF NOT EXISTS phone_book(
+                    id serial primary key,
+                    full_name VARCHAR(255) not null,
+                    phone_number VARCHAR(255) not null
+                );
+            '''
+        )
+        self.db.conn.commit()
+
+    def upload_from_csv(self, file_path):
+        if not os.path.exists(path=file_path):
+            print("Path not exists")
+            return
+        if os.path.splitext(file_path)[-1] != '.csv':
+            print("You can upload data only from csv files")
+            return
+
+        with open(file_path, 'r') as csv_file:
+            reader = csv.reader(csv_file)
+            next(reader)
+            for row in reader:
+                user = User(full_name=row[0], phone_number=row[1])
+                self.write_or_update_contact(user=user)
+
+    def write_or_update_contact(self, user: User):
+        self.db.cur.execute("CALL insert_or_update_user(%s, %s)", user.get_listed_data())
+        self.db.conn.commit()
+        print("User Created or Updated")
+
+    def search_by_pattern(self, pattern: str):
+        self.db.cur.execute("SELECT * FROM search_by_pattern(%s)", (pattern,))
+        users = self.db.cur.fetchall()
+        for user in users:
+            print(*user, sep=" | ")
+
+    def search_user(self):
+        search_term = input("Write name or phone number:\n")
+        self.search_by_pattern(pattern=search_term)
+
+    def update_user(self, user: User):
+        new_name = input("Type new name or keep empty:\n")
+        new_phone_number = input("Type new phone number or keep empty:\n")
+
+        if len(new_name.strip()) == 0:
+            new_name = user.full_name
+
+        if len(new_phone_number.strip()) == 0:
+            new_phone_number = user.phone_number
+
+        update_query = 'UPDATE phone_book SET full_name=%s, phone_number=%s WHERE full_name=%s'
+        self.db.cur.execute(update_query, (new_name, new_phone_number, user.full_name))
+        self.db.conn.commit()
+
+    def list_user(self, options: str = "", limit: int = 10, offset: int = 0) -> list:
+        if len(options) != 0:
+            self.db.cur.execute("SELECT * FROM phone_book WHERE phone_number ILIKE %s OR full_name ILIKE %s LIMIT %s OFFSET %s", 
+                                ("%" + options + "%", "%" + options + "%", limit, offset))
+        else:
+            self.db.cur.execute("SELECT * FROM phone_book LIMIT %s OFFSET %s", (limit, offset))
+
+        users = self.db.cur.fetchall()
+        return users
+
+    def print_users(self, options: str = "", limit: int = 10, offset: int = 0):
+        users = self.list_user(options=options, limit=limit, offset=offset)
+        for user in users:
+            print(*user, sep=" | ")
+
+    def create_user(self):
+        full_name = input("Write full name: ")
+        phone_number = input("Write phone number: ")
+
+        user = User(full_name=full_name, phone_number=phone_number)
+        self.write_or_update_contact(user=user)
+
+    def delete_user(self, search_term: str):
+        self.db.cur.execute("CALL delete_user_by_username_or_phone(%s)", (search_term,))
+        self.db.conn.commit()
+        print(f"User with {search_term} deleted (if found).")
+
+    def upload_users_list(self, users_list):
+        user_json = json.dumps([user.get_listed_data() for user in users_list])
+        self.db.cur.execute("CALL insert_many_users(%s)", (user_json,))
+        self.db.conn.commit()
+        print("Batch insertion completed")
+
+
+phone_book = PhoneBook()
+
+while True:
+    print("CHOOSE ACTION | q - QUIT | n - NEW CONTACT | u - UPDATE USER | l - LIST USERS | s - SEARCH USERS | csv - UPLOAD FROM CSV | bulk - BULK INSERT | delete - DELETE USER")
+    action = input("Type your action:\n").lower()
+    
+    if action == "q":
+        break
+    elif action == "n":
+        phone_book.create_user()
+    elif action == "u":
+        phone_book.update_user(User("Sample User", "123456789"))
+    elif action == "l":
+        phone_book.print_users()
+    elif action == "s":
+        phone_book.search_user()
+    elif action == "csv":
+        path = input("Type path to csv file:\n")
+        phone_book.upload_from_csv(path)
+    elif action == "bulk":
+        users = [User("Alice", "123456789"), User("Bob", "987654321")]
+        phone_book.upload_users_list(users)
+    elif action == "delete":
+        search_term = input("Enter username or phone number to delete:\n")
+        phone_book.delete_user(search_term)
+
+phone_book.db.close()
