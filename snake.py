@@ -5,23 +5,25 @@ import time
 
 pygame.init()
 
-WIDTH, HEIGHT = 820, 620  
-TILE_SIZE = 26 
-VELOCITY = 10  
+WIDTH, HEIGHT = 820, 620
+TILE_SIZE = 26
+VELOCITY = 10
 
-BG_COLOR = (45, 45, 45) 
-SNAKE_COLOR = (0, 160, 160)  
-FOOD_COLOR = (190, 10, 10)  
-TEXT_COLOR = (250, 250, 90)  
+BG_COLOR = (45, 45, 45)
+SNAKE_COLOR = (0, 160, 160)
+FOOD_COLOR = (190, 10, 10)
+TEXT_COLOR = (250, 250, 90)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Classic Snake Game")
 
 font = pygame.font.Font(None, 34)
 
+
 def draw_text(content, x, y, color=TEXT_COLOR):
     text_surface = font.render(content, True, color)
     screen.blit(text_surface, (x, y))
+
 
 def generate_food(snake_body):
     while True:
@@ -30,15 +32,23 @@ def generate_food(snake_body):
         if (x, y) not in snake_body:
             return x, y
 
+
 def draw_snake(snake_body):
     for segment in snake_body:
-        pygame.draw.rect(screen, SNAKE_COLOR, (segment[0], segment[1], TILE_SIZE, TILE_SIZE))
+        pygame.draw.rect(screen, SNAKE_COLOR,
+                         (segment[0], segment[1], TILE_SIZE, TILE_SIZE))
+
 
 def draw_food(food_pos):
-    pygame.draw.rect(screen, FOOD_COLOR, (food_pos[0], food_pos[1], TILE_SIZE, TILE_SIZE))
+    pygame.draw.rect(screen, FOOD_COLOR,
+                     (food_pos[0], food_pos[1], TILE_SIZE, TILE_SIZE))
+
 
 def game_loop():
-    snake = [(150, 150), (124, 150), (98, 150)]  
+    start_x = 6 * TILE_SIZE
+    start_y = 6 * TILE_SIZE
+    snake = [(start_x, start_y), (start_x - TILE_SIZE, start_y),
+             (start_x - 2 * TILE_SIZE, start_y)]
     direction = "RIGHT"
     food = generate_food(snake)
     score = 0
@@ -106,5 +116,6 @@ def game_loop():
     time.sleep(2)
     pygame.quit()
     sys.exit()
+
 
 game_loop()
